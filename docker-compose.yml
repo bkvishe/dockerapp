@@ -1,0 +1,33 @@
+version: '3'
+services:
+  local-mongodb:
+    image: 'mongo:3.6.20'
+    restart: always
+    container_name: 'my-mongodb-container'
+    environment:
+      - MONGO_INITDB_DATABASE=truckman
+    #   - MONGO_INITDB_ROOT_USERNAME=my-container-root-username # set your container root username
+    #   - MONGO_INITDB_ROOT_PASSWORD=secret # set your contatner root password
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongo-volume:/data/db
+      - ./home/mongodb:/home/mongodb
+    ports:
+      - '27017:27017'
+  
+  local-db:
+    image: mysql:5.7
+    restart: always
+    container_name: local-mysql
+    environment:
+      MYSQL_DATABASE: 'tm4db'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    expose:
+      - '3306'
+    volumes:
+      - ./mysql/data/:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf:ro
